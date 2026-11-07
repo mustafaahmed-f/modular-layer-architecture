@@ -1,0 +1,65 @@
+services:
+  app-dev:
+    # container_name: app-dev
+    build:
+      context: .
+      target: development
+    env_file:
+      - ./.env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    image: modular-layer-architecture:dev
+    ports:
+      - "3000:3000" # //* HOST_PORT : CONTAINER_PORT
+    volumes:
+      - .:/app
+      - /app/node_modules # //* prevents node_modules overwrite.
+    command: npm run dev
+    depends_on:
+      mysql-dev:
+        condition: service_healthy
+    networks:
+      - app-network-dev
+
+  mysql-dev:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_DATABASE: app_db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 5
+    ports:
+      - "3307:3306"
+    volumes:
+      - app-sql-data-dev:/var/lib/mysql
+    networks:
+      - app-network-dev
+
+  phpmyadmin-dev:
+    image: phpmyadmin:latest
+    restart: unless-stopped # //* Doesn’t restart if you manually stop it
+    environment:
+      PMA_HOST: mysql-dev
+      PMA_USER: root
+      PMA_PASSWORD: mypassword
+    ports:
+      - "8081:80"
+    depends_on:
+      mysql-dev:
+        condition: service_healthy
+    networks:
+      - app-network-dev
+
+networks:
+  app-network-dev:
+    driver: bridge
+volumes:
+  app-sql-data-dev:
+
+    #* npm run docker:dev:up        -> docker compose -f docker-compose.dev.yml up -d
+    #* npm run docker:dev:down      -> docker compose -f docker-compose.dev.yml down
+    #* npm run docker:dev:shell     -> docker compose -f docker-compose.dev.yml exec app-dev bash
+    #* npm run docker:dev:logs      -> docker compose -f docker-compose.dev.yml logs -f app-dev

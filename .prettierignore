@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+src/generated
+prisma/migrations
+package-lock.json
+# Copied verbatim from Auth Service - keep its original formatting.
+scripts/generate-commit.ts
+# Docker + Prisma config are kept in the exact Auth Service style.
+docker-compose*.yml
+prisma.config.ts

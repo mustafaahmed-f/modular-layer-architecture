@@ -1,0 +1,6 @@
+services:
+  app-build:
+    image: modular-layer-architecture:build
+    build:
+      context: .
+      target: builder

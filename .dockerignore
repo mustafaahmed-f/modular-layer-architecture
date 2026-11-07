@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+Dockerfile
+node_modules
+.dockerignore
+.git
+.next
+README.md 
+docker-compose*
+dist
+coverage
